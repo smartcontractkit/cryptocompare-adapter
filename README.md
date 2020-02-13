@@ -36,6 +36,20 @@ npm test
 zip -r cl-ea.zip .
 ```
 
+## Docker
+
+If you wish to use Docker to run the adapter, you can build the image by running the following command:
+
+```bash
+docker build . -t cryptocompare-adapter
+```
+
+Then run it with:
+
+```bash
+docker run -it cryptocompare-adapter:latest
+```
+
 ## Install to AWS Lambda
 
 - In Lambda Functions, create function

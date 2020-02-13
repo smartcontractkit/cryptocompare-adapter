@@ -1,9 +1,48 @@
-const request = require('request')
+const rp = require('request-promise')
+const retries = process.env.RETRIES || 3
+const delay = process.env.RETRY_DELAY || 1000
+
+const requestRetry = (options, retries) => {
+  return new Promise((resolve, reject) => {
+    const retry = (options, n) => {
+      return rp(options)
+        .then(response => {
+          if (response.body.error) {
+            if (n === 1) {
+              reject(response)
+            } else {
+              setTimeout(() => {
+                retries--
+                retry(options, retries)
+              }, delay)
+            }
+          } else {
+            return resolve(response)
+          }
+        })
+        .catch(error => {
+          if (n === 1) {
+            reject(error)
+          } else {
+            setTimeout(() => {
+              retries--
+              retry(options, retries)
+            }, delay)
+          }
+        })
+    }
+    return retry(options, retries)
+  })
+}
 
 const createRequest = (input, callback) => {
-  let url = 'https://min-api.cryptocompare.com/data/'
   const endpoint = input.data.endpoint || 'price'
-  url = url + endpoint
+  let url
+  if (process.env.DEV) {
+    url = input.data.url
+  } else {
+    url = `https://min-api.cryptocompare.com/data/${endpoint}`
+  }
 
   const coin = input.data.coin || 'ETH'
   const market = input.data.market || 'USD'
@@ -15,34 +54,29 @@ const createRequest = (input, callback) => {
     tsyms: market
   }
 
-  for (const key in queryObj) {
-    if (queryObj[key] === '') {
-      delete queryObj[key]
-    }
+  const options = {
+    uri: url,
+    qs: queryObj,
+    json: true,
+    resolveWithFullResponse: true
   }
 
-  const options = {
-    url: url,
-    qs: queryObj,
-    json: true
-  }
-  request(options, (error, response, body) => {
-    if (error || response.statusCode >= 400) {
+  requestRetry(options, retries)
+    .then(response => {
       callback(response.statusCode, {
+        jobRunID: input.id,
+        data: response.body,
+        statusCode: response.statusCode
+      })
+    })
+    .catch(error => {
+      callback(error.statusCode, {
         jobRunID: input.id,
         status: 'errored',
-        error: body,
-        statusCode: response.statusCode
+        error,
+        statusCode: error.statusCode
       })
-    } else {
-      body.result = body[market]
-      callback(response.statusCode, {
-        jobRunID: input.id,
-        data: body,
-        statusCode: response.statusCode
-      })
-    }
-  })
+    })
 }
 
 exports.gcpservice = (req, res) => {
