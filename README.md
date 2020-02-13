@@ -21,13 +21,13 @@
 ## Install
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Test
 
 ```bash
-npm test
+yarn test
 ```
 
 ## Create the zip
@@ -47,7 +47,7 @@ docker build . -t cryptocompare-adapter
 Then run it with:
 
 ```bash
-docker run -it cryptocompare-adapter:latest
+docker run -p 8080:8080 -it cryptocompare-adapter:latest
 ```
 
 ## Install to AWS Lambda
