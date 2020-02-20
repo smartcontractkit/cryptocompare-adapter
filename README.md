@@ -2,8 +2,8 @@
 
 ## Input Params
 
-- `coin`: The symbol of the currency to query
-- `market`: The symbol of the currency to convert to
+- `from` or `coin`: The symbol of the currency to query
+- `to` or `market`: The symbol of the currency to convert to
 
 ## Output
 
