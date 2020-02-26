@@ -65,7 +65,7 @@ const createRequest = (input, callback) => {
 
   requestRetry(options, retries)
     .then(response => {
-      const result = response.body[coin]
+      const result = response.body[market.toUpperCase()]
       response.body.result = result
       callback(response.statusCode, {
         jobRunID: input.id,
