@@ -65,9 +65,12 @@ const createRequest = (input, callback) => {
 
   requestRetry(options, retries)
     .then(response => {
+      const result = response.body[coin]
+      response.body.result = result
       callback(response.statusCode, {
         jobRunID: input.id,
         data: response.body,
+        result,
         statusCode: response.statusCode
       })
     })
