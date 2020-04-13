@@ -74,6 +74,7 @@ const createRequest = (input, callback) => {
       requestRetry(options, retries)
         .then(response => {
           const result = response.body[market.toUpperCase()]
+          if (Number(result) === 0) throw new Error('Zero result')
           response.body.result = result
           callback(response.statusCode, {
             jobRunID: input.id,
