@@ -3,6 +3,24 @@ const retries = process.env.RETRIES || 3
 const delay = process.env.RETRY_DELAY || 1000
 const timeout = process.env.TIMEOUT || 1000
 
+class ValidationError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = 'ValidationError'
+    this.message = message
+  }
+
+  toJSON () {
+    return {
+      error: {
+        name: this.name,
+        message: this.message,
+        stacktrace: this.stack
+      }
+    }
+  }
+}
+
 const requestRetry = (options, retries) => {
   return new Promise((resolve, reject) => {
     const retry = (options, n) => {
@@ -42,7 +60,7 @@ const validateInput = (input) => {
       input.id = '1'
     }
     if (typeof input.data === 'undefined') {
-      reject(new Error('No data supplied'))
+      reject(new ValidationError('No data supplied'))
     }
     resolve(input)
   })
@@ -74,7 +92,7 @@ const createRequest = (input, callback) => {
       requestRetry(options, retries)
         .then(response => {
           const result = response.body[market.toUpperCase()]
-          if (Number(result) === 0) throw new Error('Zero result')
+          if (Number(result) === 0) throw new ValidationError('Zero result')
           response.body.result = result
           callback(response.statusCode, {
             jobRunID: input.id,
