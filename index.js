@@ -8,9 +8,9 @@ const requestRetry = (options, retries) => {
     const retry = (options, n) => {
       return rp(options)
         .then(response => {
-          if (response.body.error) {
+          if (response.body.error || response.body.Response === 'Error') {
             if (n === 1) {
-              reject(response)
+              reject(response.body)
             } else {
               setTimeout(() => {
                 retries--
@@ -23,7 +23,7 @@ const requestRetry = (options, retries) => {
         })
         .catch(error => {
           if (n === 1) {
-            reject(error)
+            reject(error.body)
           } else {
             setTimeout(() => {
               retries--
@@ -36,50 +36,67 @@ const requestRetry = (options, retries) => {
   })
 }
 
+const validateInput = (input) => {
+  return new Promise((resolve, reject) => {
+    if (typeof input.id === 'undefined') {
+      input.id = '1'
+    }
+    if (typeof input.data === 'undefined') {
+      reject(new Error('No data supplied'))
+    }
+    resolve(input)
+  })
+}
+
 const createRequest = (input, callback) => {
-  const endpoint = input.data.endpoint || 'price'
-  let url
-  if (process.env.DEV) {
-    url = input.data.url
-  } else {
-    url = `https://min-api.cryptocompare.com/data/${endpoint}`
-  }
+  validateInput(input)
+    .then(input => {
+      const endpoint = input.data.endpoint || 'price'
+      const url = `https://min-api.cryptocompare.com/data/${endpoint}`
+      const coin = input.data.base || input.data.from || input.data.coin || input.data.fsym || ''
+      const market = input.data.quote || input.data.to || input.data.market || input.data.tsyms || ''
 
-  const coin = input.data.from || input.data.coin || input.data.fsym || ''
-  const market = input.data.to || input.data.market || input.data.tsyms || ''
+      const queryObj = {
+        fsym: coin,
+        fsyms: coin,
+        tsym: market,
+        tsyms: market
+      }
 
-  const queryObj = {
-    fsym: coin,
-    fsyms: coin,
-    tsym: market,
-    tsyms: market
-  }
+      const options = {
+        uri: url,
+        qs: queryObj,
+        json: true,
+        timeout,
+        resolveWithFullResponse: true
+      }
 
-  const options = {
-    uri: url,
-    qs: queryObj,
-    json: true,
-    timeout,
-    resolveWithFullResponse: true
-  }
-
-  requestRetry(options, retries)
-    .then(response => {
-      const result = response.body[market.toUpperCase()]
-      response.body.result = result
-      callback(response.statusCode, {
-        jobRunID: input.id,
-        data: response.body,
-        result,
-        statusCode: response.statusCode
-      })
+      requestRetry(options, retries)
+        .then(response => {
+          const result = response.body[market.toUpperCase()]
+          response.body.result = result
+          callback(response.statusCode, {
+            jobRunID: input.id,
+            data: response.body,
+            result,
+            statusCode: response.statusCode
+          })
+        })
+        .catch(error => {
+          callback(500, {
+            jobRunID: input.id,
+            status: 'errored',
+            error,
+            statusCode: 500
+          })
+        })
     })
     .catch(error => {
-      callback(error.statusCode, {
+      callback(500, {
         jobRunID: input.id,
         status: 'errored',
-        error,
-        statusCode: error.statusCode
+        error: error.message,
+        statusCode: 500
       })
     })
 }
