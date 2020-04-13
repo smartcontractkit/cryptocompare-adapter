@@ -45,8 +45,8 @@ const createRequest = (input, callback) => {
     url = `https://min-api.cryptocompare.com/data/${endpoint}`
   }
 
-  const coin = input.data.from || input.data.coin || 'ETH'
-  const market = input.data.to || input.data.market || 'USD'
+  const coin = input.data.from || input.data.coin || input.data.fsym || 'ETH'
+  const market = input.data.to || input.data.market || input.data.tsyms || 'USD'
 
   const queryObj = {
     fsym: coin,
