@@ -1,5 +1,6 @@
-const { Validator, requestRetry, getResult } = require('./adapter')
+const { Requester, Validator } = require('./adapter')
 const retries = process.env.RETRIES || 3
+const delay = process.env.RETRY_DELAY || 1000
 const timeout = process.env.TIMEOUT || 1000
 
 // Define custom error scenarios for the API.
@@ -54,9 +55,9 @@ const createRequest = (input, callback) => {
     resolveWithFullResponse: true
   }
 
-  requestRetry(options, retries, customError)
+  Requester.requestRetry(options, retries, delay, customError)
     .then(response => {
-      const result = getResult(response.body, [quote])
+      const result = Requester.getResult(response.body, [quote])
       response.body.result = result
       callback(response.statusCode, {
         jobRunID,

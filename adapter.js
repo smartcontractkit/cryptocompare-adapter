@@ -1,5 +1,4 @@
 const rp = require('request-promise')
-const delay = process.env.RETRY_DELAY || 1000
 
 class ValidationError extends Error {
   constructor (message) {
@@ -86,44 +85,44 @@ class Validator {
   }
 }
 
-const requestRetry = (options, retries, customError) => {
-  return new Promise((resolve, reject) => {
-    const retry = (options, n) => {
-      return rp(options)
-        .then(response => {
-          if (response.body.error || customError(response.body)) {
+class Requester {
+  static requestRetry (options, retries, delay, customError) {
+    return new Promise((resolve, reject) => {
+      const retry = (options, n) => {
+        return rp(options)
+          .then(response => {
+            if (response.body.error || customError(response.body)) {
+              if (n === 1) {
+                reject(response.body)
+              } else {
+                setTimeout(() => {
+                  retries--
+                  retry(options, retries)
+                }, delay)
+              }
+            } else {
+              return resolve(response)
+            }
+          })
+          .catch(error => {
             if (n === 1) {
-              reject(response.body)
+              reject(error.message)
             } else {
               setTimeout(() => {
                 retries--
                 retry(options, retries)
               }, delay)
             }
-          } else {
-            return resolve(response)
-          }
-        })
-        .catch(error => {
-          if (n === 1) {
-            reject(error.message)
-          } else {
-            setTimeout(() => {
-              retries--
-              retry(options, retries)
-            }, delay)
-          }
-        })
-    }
-    return retry(options, retries)
-  })
+          })
+      }
+      return retry(options, retries)
+    })
+  }
+
+  static getResult (body, path) {
+    return path.reduce((o, n) => o[n], body)
+  }
 }
 
-const getResult = (body, path) => {
-  return path.reduce((o, n) => o[n], body)
-}
-
-exports.ValidationError = ValidationError
+exports.Requester = Requester
 exports.Validator = Validator
-exports.requestRetry = requestRetry
-exports.getResult = getResult
