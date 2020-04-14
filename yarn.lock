@@ -705,6 +705,14 @@ extend@~3.0.2:
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
 
+external-adapter@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/external-adapter/-/external-adapter-0.1.0.tgz#fa7dfb0a92940da1511946e56a88ae3aee5a21db"
+  integrity sha512-LNVCK4dEXXd4fx3EDemG3N8lijJjaKOdLEX41PqnBKKlrOKuR0E0X2X6rGuFUuB3yboPNip+zVld0sScOS+OzA==
+  dependencies:
+    request "^2.88.2"
+    request-promise "^4.2.5"
+
 external-editor@^3.0.3:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/external-editor/-/external-editor-3.1.0.tgz#cb03f740befae03ea4d283caed2741a83f335495"
@@ -1655,7 +1663,7 @@ request-promise@^4.2.5:
     stealthy-require "^1.1.1"
     tough-cookie "^2.3.3"
 
-request@^2.88.0:
+request@^2.88.2:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==

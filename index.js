@@ -1,4 +1,4 @@
-const { Requester, Validator } = require('./adapter')
+const { Requester, Validator } = require('external-adapter')
 const retries = process.env.RETRIES || 3
 const delay = process.env.RETRY_DELAY || 1000
 const timeout = process.env.TIMEOUT || 1000
