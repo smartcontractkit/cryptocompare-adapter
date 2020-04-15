@@ -22,12 +22,7 @@ const createRequest = (input, callback) => {
   try {
     validator = new Validator(input, customParams)
   } catch (error) {
-    callback(500, {
-      jobRunID: input.id,
-      status: 'errored',
-      error,
-      statusCode: 500
-    })
+    Requester.errorCallback(input.id, error, callback)
   }
   const jobRunID = validator.validated.id
   const endpoint = validator.validated.data.endpoint || 'price'
@@ -47,22 +42,11 @@ const createRequest = (input, callback) => {
 
   Requester.requestRetry(options, customError)
     .then(response => {
-      const result = Requester.validateResult(response.body, [tsyms])
-      response.body.result = result
-      callback(response.statusCode, {
-        jobRunID,
-        data: response.body,
-        result,
-        statusCode: response.statusCode
-      })
+      response.body.result = Requester.validateResult(response.body, [tsyms])
+      Requester.successCallback(jobRunID, response.statusCode, response.body, callback)
     })
     .catch(error => {
-      callback(500, {
-        jobRunID,
-        status: 'errored',
-        error,
-        statusCode: 500
-      })
+      Requester.errorCallback(jobRunID, error, callback)
     })
 }
 
