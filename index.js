@@ -1,7 +1,4 @@
 const { Requester, Validator } = require('external-adapter')
-const retries = process.env.RETRIES || 3
-const delay = process.env.RETRY_DELAY || 1000
-const timeout = process.env.TIMEOUT || 1000
 
 // Define custom error scenarios for the API.
 // Return true for the adapter to retry.
@@ -15,11 +12,9 @@ const customError = (body) => {
 // with a Boolean value indicating whether or not they
 // should be required.
 const customParams = {
-  base: ['fsym'],
-  quote: ['tsyms'],
-  extra: {
-    endpoint: false
-  }
+  base: ['base', 'from', 'coin', 'fsym'],
+  quote: ['quote', 'to', 'market', 'tsyms'],
+  endpoint: false
 }
 
 const createRequest = (input, callback) => {
@@ -37,27 +32,22 @@ const createRequest = (input, callback) => {
   const jobRunID = validator.validated.id
   const endpoint = validator.validated.data.endpoint || 'price'
   const url = `https://min-api.cryptocompare.com/data/${endpoint}`
-  const base = validator.validated.data.base.toUpperCase()
-  const quote = validator.validated.data.quote.toUpperCase()
+  const fsym = validator.validated.data.base.toUpperCase()
+  const tsyms = validator.validated.data.quote.toUpperCase()
 
-  const queryObj = {
-    fsym: base,
-    fsyms: base,
-    tsym: quote,
-    tsyms: quote
+  const qs = {
+    fsym,
+    tsyms
   }
 
   const options = {
-    uri: url,
-    qs: queryObj,
-    json: true,
-    timeout,
-    resolveWithFullResponse: true
+    url,
+    qs
   }
 
-  Requester.requestRetry(options, retries, delay, customError)
+  Requester.requestRetry(options, customError)
     .then(response => {
-      const result = Requester.getResult(response.body, [quote])
+      const result = Requester.validateResult(response.body, [tsyms])
       response.body.result = result
       callback(response.statusCode, {
         jobRunID,

@@ -705,10 +705,10 @@ extend@~3.0.2:
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
 
-external-adapter@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/external-adapter/-/external-adapter-0.1.1.tgz#f9223990635441a023dcf56d250704d39706eab6"
-  integrity sha512-v/GkGPuJfHNQ/WA33tlleEd+ehXvPulrFRbgnc98J8FtN4OrBazbmApoKhyHFgYfyUExabUoVtdNeoCLWHzG7A==
+external-adapter@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/external-adapter/-/external-adapter-0.1.7.tgz#30e670b5ff158c6b28e6b9426a247789ab16a0fb"
+  integrity sha512-1FzEbzluU7TsrqDvTpHTVD2QjwGd7BCCzWfHIjfZajKwLgiIxfEtgY6nyhQB/BOnfDE1YVSjc0m0TZRGtSa3pw==
   dependencies:
     request "^2.88.2"
     request-promise "^4.2.5"
