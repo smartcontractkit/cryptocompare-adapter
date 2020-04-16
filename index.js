@@ -18,12 +18,7 @@ const customParams = {
 }
 
 const createRequest = (input, callback) => {
-  let validator
-  try {
-    validator = new Validator(input, customParams)
-  } catch (error) {
-    Requester.errorCallback(input.id, error, callback)
-  }
+  const validator = new Validator(input, customParams, callback)
   const jobRunID = validator.validated.id
   const endpoint = validator.validated.data.endpoint || 'price'
   const url = `https://min-api.cryptocompare.com/data/${endpoint}`
