@@ -38,10 +38,10 @@ const createRequest = (input, callback) => {
   Requester.requestRetry(options, customError)
     .then(response => {
       response.body.result = Requester.validateResult(response.body, [tsyms])
-      callback(response.statusCode, Requester.successCallback(jobRunID, response))
+      callback(response.statusCode, Requester.success(jobRunID, response))
     })
     .catch(error => {
-      callback(500, Requester.errorCallback(jobRunID, error))
+      callback(500, Requester.errored(jobRunID, error))
     })
 }
 
