@@ -1,5 +1,7 @@
 # Chainlink External Adapter for CryptoCompare
 
+**This adapter has moved to our [external adapters monorepo](https://github.com/smartcontractkit/external-adapters-js)!**
+
 ## Input Params
 
 - `base`, `from`, `coin`, or `fsym`: The symbol of the currency to query
